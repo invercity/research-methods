@@ -3,117 +3,89 @@ package ua.invercity.research;
 import Jama.Matrix;
 
 public class Statistic {
-	public int lengrows;
-	public int lengcol;	
-	public double [][] Matrix;
+	public int rowCount;
+	public int columnCount;	
+	public double [][] dataMatrix = new double[10][4];
 	
-	private double [] sred; 
+	private double [] middleValues; 
 	private double [] standOtkl;
 	private double [][] normMatr;
 	private double [][] cormatr;
 	
-	public Statistic(int rows, int col, double [][] matr)
-	{
-		lengrows = rows;
-		lengcol = col;
-		Matrix = matr;
-		sred = new double[lengcol];
-		standOtkl = new double[lengcol]; 
-		normMatr = new double[lengrows][lengcol];
+	public Statistic(int rows, int col, Object [][] matr) {
+		// initialize variables
+		rowCount = rows;
+		columnCount = col;
+		parseDouble(matr);
+		middleValues = new double[columnCount];
+		standOtkl = new double[columnCount]; 
+		normMatr = new double[rowCount][columnCount];
 		cormatr = new double[3][3]; 
+		// make calculations
+		computeAll();
 	}
 	
-	public void sredZnach() 
-	{ 
-		for (int k=0; k<lengcol; k++)
-		{ 
+	private void computeAll() {
+		computeAvg();
+		computeStandartOtkl();
+		computeNorm();
+		computeTransMult();
+	}
+	
+	private void computeAvg() { 
+		for (int k=0; k<columnCount; k++) { 
 			double summa = 0; 
-			for (int i=0; i<lengrows; i++) 
-			{ 
-				summa = summa + Matrix[i][k]; 
-			} 
-			sred[k] = summa/lengrows; 
+			for (int i=0; i<rowCount; i++) summa += dataMatrix[i][k]; 
+			middleValues[k] = summa/rowCount; 
 		}
 	}
 	
-	public void standartOtkl() 
-	{ 
-		for (int k=0; k<lengcol; k++)
-		{ 
+	private void computeStandartOtkl() { 
+		for (int k=0; k<columnCount; k++) { 
 			double summa = 0; 
-			for (int i=0; i<lengrows; i++) 
-			{ 
-				summa += Math.pow((Matrix[i][k]-sred[k]),2); 
-			} 
-			standOtkl[k] = Math.sqrt(summa/(lengrows-1)); 
+			for (int i=0; i<rowCount; i++) summa += Math.pow((dataMatrix[i][k]-middleValues[k]),2); 
+			standOtkl[k] = Math.sqrt(summa/(rowCount-1)); 
 		} 
 	}
 	
-	public void norm() 
-	{ 
-		for (int k=0; k<lengcol; k++)
-		{ 
-			for (int i=0; i<lengrows; i++) 
-			{ 
-				normMatr[i][k]=(Matrix[i][k]-sred[k])/standOtkl[k];
-			} 
+	private void computeNorm() { 
+		for (int k=0; k<columnCount; k++) { 
+			for (int i=0; i<rowCount; i++) normMatr[i][k]=(dataMatrix[i][k]-middleValues[k])/standOtkl[k];
 		} 
 	} 
 	
-	public void transMult() { 
-		double[][] tr = new double[lengcol-1][lengrows]; 
-		double[][] normMatrNew = new double[lengrows][lengcol-1];
-		for (int i=1; i<lengcol; i++) 
-		{ 
-			for (int k=0; k<lengrows; k++) 
-			{ 
-				normMatrNew[k][i-1]=normMatr[k][i]; 
-			} 
+	private void computeTransMult() { 
+		double[][] tr = new double[columnCount-1][rowCount]; 
+		double[][] normMatrNew = new double[rowCount][columnCount-1];
+		for (int i=1; i<columnCount; i++) { 
+			for (int k=0; k<rowCount; k++) normMatrNew[k][i-1]=normMatr[k][i]; 
 		}
-		for (int i=0; i<lengrows; i++) 
-		{ 
-			for (int k=0; k<lengcol-1; k++) 
-			{ 
-				tr[k][i]=normMatrNew[i][k]; 
-			} 
+		for (int i=0; i<rowCount; i++) { 
+			for (int k=0; k<columnCount-1; k++) tr[k][i]=normMatrNew[i][k]; 
 		}
 		
-		cormatr = multMatrix(tr,normMatrNew,lengcol-1,lengrows,lengcol-1);
-		for (int i=0; i<lengcol-1; i++) 
-		{ 
-			for (int k=0; k<lengcol-1; k++) 
-			{ 
-				cormatr[k][i] = (cormatr[k][i])/9; 
-			} 
+		cormatr = multMatrix(tr,normMatrNew,columnCount-1,rowCount,columnCount-1);
+		for (int i=0; i<columnCount-1; i++) { 
+			for (int k=0; k<columnCount-1; k++) cormatr[k][i] = (cormatr[k][i])/9; 
 		}
 	} 
 	
-	private double determMatrix() { 
-		double deter = cormatr[0][0]*cormatr[1][1]*cormatr[2][2]+cormatr[2][0]*cormatr[0][1]*cormatr[1][2]+cormatr[1][0]*cormatr[0][2]*cormatr[2][1]-(cormatr[0][2]*cormatr[1][1]*cormatr[2][0]+cormatr[0][1]*cormatr[1][0]*cormatr[2][2]+cormatr[0][0]*cormatr[2][1]*cormatr[1][2]); 
-		System.out.println("\nВизначник кореляційної матриці наближається до "+deter+" ~ 0, то в масиві змінних може існувати мультиколінеарність\n");
-		return deter;
+	public double getDetermMatrix() { 
+		return cormatr[0][0]*cormatr[1][1]*cormatr[2][2]+cormatr[2][0]*cormatr[0][1]*cormatr[1][2]+cormatr[1][0]*cormatr[0][2]*cormatr[2][1]-(cormatr[0][2]*cormatr[1][1]*cormatr[2][0]+cormatr[0][1]*cormatr[1][0]*cormatr[2][2]+cormatr[0][0]*cormatr[2][1]*cormatr[1][2]); 
 	}
 	
-	public void TestFi() 
-	{ 
-		double pfi=-(lengrows-1-((2*3+5)/6))*Math.log10(determMatrix());
-		System.out.println("Перевірка всього масиву змінних на наявність колінеарності за критерієм X^2"); 
-		System.out.println("Так як Фи розраховане "+pfi+"<7,81 X^2 табл. (для 3 ступенів свободи та рівня значущості 0,05)");
-		System.out.println("Це означає що в масиві незалежних змінних не існує мультиколінеарністі");
+	public double getTestFi() { 
+		return -(rowCount-1-((2*3+5)/6))*Math.log10(getDetermMatrix());
 	}
-	public void TestF() 
-	{ 
+	
+	public double[] getTestFArray() { 
         Matrix a = new Matrix(cormatr);
         Matrix b = a.inverse();
-        //b.print(10, 2);
-		double ef1=b.get(0,0)*((lengrows-3)/(3-1));
-		double ef2=b.get(1,1)*((lengrows-3)/(3-1));
-		double ef3= b.get(2,2)*((lengrows-3)/(3-1));
-		System.out.println("Перевірка на колінеарність окремих змінних з іншими за критерієм Ф (для ступенів свободи V1=7, V2=2 та рівня значущості 0,05)"); 
-		System.out.println("Розраховане Ф1 "+ef1+"<4,74 Ф табл.");
-		System.out.println("Розраховане Ф2 "+ef2+"<4,74 Ф табл.");
-		System.out.println("Розраховане Ф3 "+ef3+"<4,74 Ф табл.");
-		System.out.println("Це означає що кожна з незалежних змінних  не колінеарна з іншими");
+        double[] result = new double[3];
+		result[0] = b.get(0,0)*((rowCount-3)/(3-1));
+		result[1] = b.get(1,1)*((rowCount-3)/(3-1));
+		result[2] = b.get(2,2)*((rowCount-3)/(3-1));
+		return result;
 	}
 	
 	public  void TestKor() 
@@ -135,9 +107,9 @@ public class Statistic {
 		double r132=-(-0.034464957)/Math.sqrt(1.00484673*1.316084621);
 		double r231=-(0.046116733)/Math.sqrt(1.317019012*1.00484673);
 		
-		double t12= r123*Math.sqrt(lengrows-3)/Math.sqrt(1-Math.pow(r123,2));
-		double t13=r132*Math.sqrt(lengrows-3)/Math.sqrt(1-Math.pow(r132,2));
-		double t23=r231*Math.sqrt(lengrows-3)/Math.sqrt(1-Math.pow(r231,2));
+		double t12= r123*Math.sqrt(rowCount-3)/Math.sqrt(1-Math.pow(r123,2));
+		double t13=r132*Math.sqrt(rowCount-3)/Math.sqrt(1-Math.pow(r132,2));
+		double t23=r231*Math.sqrt(rowCount-3)/Math.sqrt(1-Math.pow(r231,2));
 		
 		System.out.println("Перевірка на колінеарність кожної пари змінних за допомогою t-критеріями (для значення ступенів свободи 7 та рівня значущості 0,05)");
 		System.out.println("Розраховане t1 "+t12+"<2,365 t табл. це означає що х1 і х2 не колінеарні між собою");
@@ -169,22 +141,22 @@ public class Statistic {
 	{
 		//Формула МНК В=(Хтрансп*Х)-1*(Хтрасп*У)
 		//матрица Х(х-си нормализованные) {1,x11,x12,x13; 1,x21,x22,x32,....}
-		double[][] matrX = new double[lengrows][lengcol];
+		double[][] matrX = new double[rowCount][columnCount];
 		//транспонированая матр Х
-		double[][] matrXt = new double[lengcol][lengrows];
+		double[][] matrXt = new double[columnCount][rowCount];
 		//резулитирующая матр умножения транспонированой матр Х на обычную Х
-		double[][] matrMultXtX = new double[lengcol][lengcol];
+		double[][] matrMultXtX = new double[columnCount][columnCount];
 		//резулитирующая матр умножения транспонированой матр Х на У
-		double[][]matrMultXtY = new double[lengcol][1];
+		double[][]matrMultXtY = new double[columnCount][1];
 		//результирующая матр коефициентов {в0,в1,в2,в3}
-		double[][] resultMatr = new double[lengcol][1];
+		double[][] resultMatr = new double[columnCount][1];
 		//матр нормализованных У
-		double[][] arrY = new double[lengrows][1];
+		double[][] arrY = new double[rowCount][1];
 		
 		//формируем маирицы Х(нулевой столбик забит эдиницами) и У
-		for(int i=0; i<lengcol;i++)
+		for(int i=0; i<columnCount;i++)
 		{
-			for(int j=0; j<lengrows;j++)
+			for(int j=0; j<rowCount;j++)
 			{
 				if(i==0)
 				{
@@ -196,40 +168,47 @@ public class Statistic {
 			}
 		}
 		//транспонирование матр Х
-		for (int i=0; i<lengrows; i++) 
+		for (int i=0; i<rowCount; i++) 
 		{ 
-			for (int k=0; k<lengcol; k++) 
+			for (int k=0; k<columnCount; k++) 
 			{ 
 				matrXt[k][i]=matrX[i][k]; 
 			} 
 		}
 		//умножение транспонированой матр Х на обычную Х
-		matrMultXtX = multMatrix(matrXt,matrX,lengcol,lengrows,lengcol);
+		matrMultXtX = multMatrix(matrXt,matrX,columnCount,rowCount,columnCount);
 		//умножение транспонированой матр Х на матр У
-		matrMultXtY = multMatrix(matrXt,arrY,lengcol,lengrows,1);
+		matrMultXtY = multMatrix(matrXt,arrY,columnCount,rowCount,1);
 	    
 		//нахождение обратной матрицы к резулитирующая матр умножения транспонированой матр Х на обычную Х
 	    Matrix a = new Matrix(matrMultXtX);
 	    Matrix b = a.inverse();
-		for (int i=0; i<lengcol; i++) 
+		for (int i=0; i<columnCount; i++) 
 		{ 
-			for (int z=0; z<lengcol; z++) 
+			for (int z=0; z<columnCount; z++) 
 			{
 				matrMultXtX[i][z] = b.get(i,z);
 			}
 		}
-	    resultMatr = multMatrix(matrMultXtX,matrMultXtY,lengcol,lengcol,1);
+	    resultMatr = multMatrix(matrMultXtX,matrMultXtY,columnCount,columnCount,1);
 //	    Matrix cur = new Matrix(resultMatr);
 //	    cur.print(10, 8);
 		//подсчет коефициентов
 		double b1= resultMatr[1][0]*standOtkl[0]/standOtkl[1];		
 		double b2=resultMatr[2][0]*standOtkl[0]/standOtkl[2];
 		double b3=resultMatr[3][0]*standOtkl[0]/standOtkl[3];
-		double b0= sred[0]-b1*sred[1]-b2*sred[2]-b3*sred[3];
-		for(int i=0; i<lengrows;i++)
+		double b0= middleValues[0]-b1*middleValues[1]-b2*middleValues[2]-b3*middleValues[3];
+		for(int i=0; i<rowCount;i++)
 		{
-			System.out.println(b0+b1*Matrix[i][1]+b2*Matrix[i][2]+b3*Matrix[i][3]);
+			System.out.println(b0+b1*dataMatrix[i][1]+b2*dataMatrix[i][2]+b3*dataMatrix[i][3]);
 		}
 
+	}
+	
+	private double[][] parseDouble(Object[][] data) {
+		for (int i=0;i<rowCount;i++)
+			for (int j=0;j<columnCount;j++)
+				dataMatrix[i][j] = (double) data[i][j];
+		return dataMatrix;
 	}
 }

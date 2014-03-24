@@ -17,19 +17,13 @@ import java.awt.Font;
 
 public class DataInput extends JDialog {
 
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 1L;
 	private DefaultTableModel model;
 	private JTable table;
 	private Object[][] defaultData;
-	private String[] defaultColumnNames = {"1", "2", "3", "4"};
+	private String[] defaultColumnNames = {"Y", "X1", "X2", "X3"};
 	private MainView main = null;
 
-	/**
-	 * Create the dialog.
-	 */
 	public DataInput() {
 		setTitle("Ввод данных");
 		setBounds(100, 100, 450, 300);

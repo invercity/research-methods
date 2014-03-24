@@ -71,7 +71,7 @@ public class MainView {
 	private void initialize() {
 		frmResearchMethods = new JFrame();
 		frmResearchMethods.setTitle("Методы научных исследований");
-		frmResearchMethods.setBounds(100, 100, 750, 450);
+		frmResearchMethods.setBounds(100, 100, 807, 450);
 		frmResearchMethods.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		String[] buttons = {
 				"Мультиколинеарность",
@@ -87,9 +87,28 @@ public class MainView {
 					clicked = true;
 					int index = list.getSelectedIndex();
 					textArea.setText("");
+					Statistic s = new Statistic(10, 4, data);
 					switch (index) {
 					case 0:
-						textArea.append("Мультиколинеарность");
+						textArea.append("Мультиколинеарность\n");
+						textArea.append("\n");
+						double determ = s.getDetermMatrix();
+						textArea.append("Определитель кореляционной матрицы - " + determ + ";\n");
+						textArea.append("Поскольку определитель ~0, в массиве может \nсуществовать мультиколинеарность\n");
+						textArea.append("\n");
+						textArea.append("Проверка всего массива на наличие зависимоти по критерию X^2\n");
+						double fi = s.getTestFi();
+						textArea.append("Так как Фи рассчитанное= " + fi + "<7,81 X^2 табл.\n");
+						textArea.append("(для уровней свободы 3 и уровня значимости 0,05)\n");
+						textArea.append("Это значит, что в массиве переменных не сущ. мультиколинеарности\n");
+						textArea.append("\n");
+						textArea.append("Проверка на колинеарность отдельных переменных по Ф критерию\n");
+						textArea.append("(для степеней свободы V1=7, V2=2 и уровня значимости 0,05)\n");
+						double[] fArray = s.getTestFArray();
+						textArea.append("Значение Ф1: " + fArray[0] + "<4.74 Ф табл.\n");
+						textArea.append("Значение Ф2: " + fArray[1] + "<4.74 Ф табл.\n");
+						textArea.append("Значение Ф3: " + fArray[2] + "<4.74 Ф табл.\n");
+						textArea.append("Это значит, что каждая из переменных не колинеарна с другими\n");
 						break;
 					case 1: 
 						textArea.append("Гетероскедастичность");

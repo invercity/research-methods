@@ -24,7 +24,6 @@ public class MainView {
 	private JFrame frmResearchMethods;
 	private JList list;
 	private JScrollPane scrollPane;
-	private JTextArea textArea;
 	private JMenuBar menuBar;
 	private JMenu menu;
 	private JMenuItem menuData;
@@ -41,6 +40,8 @@ public class MainView {
 		{(double) 17.6, (double) 3.9, (double) 6.7, (double) 4.7}, 
 		{(double) 17.6, (double) 3.4, (double) 9.4, (double) 4.2}
 	}; 
+	private JScrollPane scrollPane_1;
+	private JTextArea textArea;
 	/**
 	 * Launch the application.
 	 */
@@ -71,7 +72,7 @@ public class MainView {
 	private void initialize() {
 		frmResearchMethods = new JFrame();
 		frmResearchMethods.setTitle("Методы научных исследований");
-		frmResearchMethods.setBounds(100, 100, 807, 450);
+		frmResearchMethods.setBounds(100, 100, 735, 450);
 		frmResearchMethods.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		String[] buttons = {
 				"Мультиколинеарность",
@@ -109,6 +110,25 @@ public class MainView {
 						textArea.append("Значение Ф2: " + fArray[1] + "<4.74 Ф табл.\n");
 						textArea.append("Значение Ф3: " + fArray[2] + "<4.74 Ф табл.\n");
 						textArea.append("Это значит, что каждая из переменных не колинеарна с другими\n");
+						textArea.append("\n");
+						textArea.append("Определение частичных коефициентов кореляции\n");
+						double[] kArray = s.getTestKor();
+						textArea.append("k1: " + kArray[0] + "\n");
+						textArea.append("между х1 и х2 существует умеренная связь, если не учитывать влияние х3\n");
+						textArea.append("k2: " + kArray[1] + "\n");
+						textArea.append("между х1 и х3 существует слабая связь, если не учитывать влияние х2\n");
+						textArea.append("k3: " + kArray[2] + "\n");
+						textArea.append("между х2 и х3 существует умеренная связь, если не учитывать влияние х1\n");
+						textArea.append("\n");
+						textArea.append("Проверка на колинеарность с помощью t-критерия\n");
+						textArea.append("(для степеней свободы V1=7, V2=2 и уровня значимости 0,05)\n");
+						double tArray[] = s.getTestT();
+						textArea.append("t1: " + tArray[0] + "< t табл (2.365)\n");
+						textArea.append("Это значит, что х1 и х2 не колинеарны между собой\n");
+						textArea.append("t2: " + tArray[1] + "< t табл (2.365)\n");
+						textArea.append("Это значит, что х1 и х3 не колинеарны между собой\n");
+						textArea.append("t3: " + tArray[2] + "< t табл (2.365)\n");
+						textArea.append("Это значит, что х2 и х3 не колинеарны между собой\n");
 						break;
 					case 1: 
 						textArea.append("Гетероскедастичность");
@@ -121,10 +141,12 @@ public class MainView {
 		});
 		scrollPane = new JScrollPane(list);
 		frmResearchMethods.getContentPane().add(scrollPane, BorderLayout.WEST);
+		
+		scrollPane_1 = new JScrollPane();
+		frmResearchMethods.getContentPane().add(scrollPane_1, BorderLayout.CENTER);
+		
 		textArea = new JTextArea();
-		textArea.setFont(new Font("Dialog", Font.PLAIN, 15));
-		textArea.setEditable(false);
-		frmResearchMethods.getContentPane().add(textArea, BorderLayout.CENTER);
+		scrollPane_1.setRowHeaderView(textArea);
 		
 		menuBar = new JMenuBar();
 		frmResearchMethods.setJMenuBar(menuBar);

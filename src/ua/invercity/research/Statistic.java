@@ -108,10 +108,6 @@ public class Statistic {
 		result[1] = r132*Math.sqrt(rowCount-3)/Math.sqrt(1-Math.pow(r132,2));
 		result[2] = r231*Math.sqrt(rowCount-3)/Math.sqrt(1-Math.pow(r231,2));
 		return result;
-		//System.out.println("Перевірка на колінеарність кожної пари змінних за допомогою t-критеріями (для значення ступенів свободи 7 та рівня значущості 0,05)");
-		//System.out.println("Розраховане t1 "+t12+"<2,365 t табл. це означає що х1 і х2 не колінеарні між собою");
-		//System.out.println("Розраховане t2 "+t13+"<2,365 t табл.це означає що х1 і х3 не колінеарні між собою");
-		//System.out.println("Розраховане t3 "+t23+"<2,365 t табл.це означає що х2 і х3 не колінеарні між собою");
 	}
 	
 	private double[][] multMatrix(double[][]matr1, double[][] matr2, int lengrows1, int lengcol1, int lengcol2) {

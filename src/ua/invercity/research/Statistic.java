@@ -6,11 +6,17 @@ public class Statistic {
 	public int rowCount;
 	public int columnCount;	
 	public double [][] dataMatrix = new double[10][4];
-	
+	// --- multi-kolinearity
 	private double [] middleValues; 
 	private double [] standOtkl;
 	private double [][] normMatr;
 	private double [][] cormatr;
+	// --- hetero
+	private double [] e;
+	private double [][] v;
+	private double [][] v1;
+	private double [][] v2;
+	private double [] Ytr;
 	
 	public Statistic(int rows, int col, Object [][] matr) {
 		// initialize variables
@@ -21,6 +27,11 @@ public class Statistic {
 		standOtkl = new double[columnCount]; 
 		normMatr = new double[rowCount][columnCount];
 		cormatr = new double[3][3]; 
+		Ytr = new double[10];
+		e = new double[10];
+		v = new double[10][3];
+		v1 = new double[10][3];
+		v2 = new double[10][3];
 		// make calculations
 		computeAll();
 	}
@@ -180,7 +191,6 @@ public class Statistic {
 		for(int i=0; i<rowCount;i++) {
 			//System.out.println(b0+b1*dataMatrix[i][1]+b2*dataMatrix[i][2]+b3*dataMatrix[i][3]);
 		}
-
 	}
 	
 	private double[][] parseDouble(Object[][] data) {

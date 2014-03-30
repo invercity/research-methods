@@ -5,7 +5,7 @@ import Jama.Matrix;
 public class Statistic {
 	public int rowCount;
 	public int columnCount;	
-	public double [][] dataMatrix = new double[10][4];
+	public double [][] arr = new double[10][4];
 	// --- multi-kolinearity
 	private double [] middleValues; 
 	private double [] standOtkl;
@@ -17,6 +17,8 @@ public class Statistic {
 	private double [][] v1;
 	private double [][] v2;
 	private double [] Ytr;
+	private static double []arr1 = 
+		{(double) 7.155196516872915, (double) 0.37930279709037523, (double) 0.5169114555157318, (double) 1.0070783381276622}; 
 	
 	public Statistic(int rows, int col, Object [][] matr) {
 		// initialize variables
@@ -46,7 +48,7 @@ public class Statistic {
 	private void computeAvg() { 
 		for (int k=0; k<columnCount; k++) { 
 			double summa = 0; 
-			for (int i=0; i<rowCount; i++) summa += dataMatrix[i][k]; 
+			for (int i=0; i<rowCount; i++) summa += arr[i][k]; 
 			middleValues[k] = summa/rowCount; 
 		}
 	}
@@ -54,14 +56,14 @@ public class Statistic {
 	private void computeStandartOtkl() { 
 		for (int k=0; k<columnCount; k++) { 
 			double summa = 0; 
-			for (int i=0; i<rowCount; i++) summa += Math.pow((dataMatrix[i][k]-middleValues[k]),2); 
+			for (int i=0; i<rowCount; i++) summa += Math.pow((arr[i][k]-middleValues[k]),2); 
 			standOtkl[k] = Math.sqrt(summa/(rowCount-1)); 
 		} 
 	}
 	
 	private void computeNorm() { 
 		for (int k=0; k<columnCount; k++) { 
-			for (int i=0; i<rowCount; i++) normMatr[i][k]=(dataMatrix[i][k]-middleValues[k])/standOtkl[k];
+			for (int i=0; i<rowCount; i++) normMatr[i][k]=(arr[i][k]-middleValues[k])/standOtkl[k];
 		} 
 	} 
 	
@@ -189,14 +191,125 @@ public class Statistic {
 		double b3=resultMatr[3][0]*standOtkl[0]/standOtkl[3];
 		double b0= middleValues[0]-b1*middleValues[1]-b2*middleValues[2]-b3*middleValues[3];
 		// create result array
-		for(int i=0; i<rowCount;i++) result[i] = b0+b1*dataMatrix[i][1]+b2*dataMatrix[i][2]+b3*dataMatrix[i][3];
+		for(int i=0; i<rowCount;i++) result[i] = b0+b1*arr[i][1]+b2*arr[i][2]+b3*arr[i][3];
 		return result;
 	}
 	
 	private double[][] parseDouble(Object[][] data) {
 		for (int i=0;i<rowCount;i++)
 			for (int j=0;j<columnCount;j++)
-				dataMatrix[i][j] = (double) data[i][j];
-		return dataMatrix;
+				arr[i][j] = (double) data[i][j];
+		return arr;
+	}
+	
+	public  void syntMod() {
+		for (int i=0; i<10; i++){
+			//for (int j=0; j<4; j++){
+			//System.out.println(Ytr[i]);
+		Ytr[i]=arr1[0]+arr[i][1]*arr1[1]+arr[i][2]*arr1[2]+arr[i][3]*arr1[3];
+		System.out.println("Ytr ="+Ytr[i]);
+		}
+}
+	
+
+	public void pohMod() {
+	for (int i=0; i<10; i++){
+		e[i]=Math.abs(arr[i][0]-Ytr[i]);
+		System.out.println("e="+e[i]);
+	}
+	}
+	public void vpor() {
+		for (int i=0; i<10; i++){
+			v[i][0]=i;
+			v[i][1]=e[i];
+			v[i][2]=arr[i][1];
+			System.out.println("для Х1"+" "+v[i][0]+" "+v[i][1]+" "+v[i][2]);
+			v1[i][0]=i;
+			v1[i][1]=e[i];
+			v1[i][2]=arr[i][2];
+			System.out.println("для Х2"+" "+v1[i][0]+" "+v1[i][1]+" "+v1[i][2]);
+			v2[i][0]=i;
+			v2[i][1]=e[i];
+			v2[i][2]=arr[i][3];
+			System.out.println("для Х3"+" "+v2[i][0]+" "+v2[i][1]+" "+v2[i][2]);
+		}
+		System.out.println("Упорядоченная для Х1");
+			for (int i=0; i < 10; i++) {				// используем метод "сортировка выбором" для преобразования массива
+				for (int k=i+1; k < 10; k++) {
+					if (v[i][2] > v[k][2]){
+							double temp = v[i][2];
+							v[i][2]=v[k][2];
+							v[k][2]=temp;
+							temp = v[i][1];
+							v[i][1]=v[k][1];
+							v[k][1]=temp;
+							temp = v[i][0];				
+							v[i][0]=v[k][0];
+							v[k][0]=temp;
+						}
+					}
+				System.out.println(v[i][0]+" "+v[i][1]+" "+v[i][2]);
+				}
+			System.out.println("Упорядоченная для Х2");
+			for (int i=0; i < 10; i++) {				// используем метод "сортировка выбором" для преобразования массива
+				for (int k=i+1; k < 10; k++) {
+					if (v1[i][2] > v1[k][2]){
+							double temp = v1[i][2];
+							v1[i][2]=v1[k][2];
+							v1[k][2]=temp;
+							temp = v1[i][1];
+							v1[i][1]=v1[k][1];
+							v1[k][1]=temp;
+							temp = v1[i][0];
+							v1[i][0]=v1[k][0];
+							v1[k][0]=temp;
+						}
+					}
+				System.out.println(v1[i][0]+" "+v1[i][1]+" "+v1[i][2]);
+				}
+			System.out.println("Упорядоченная для Х3");
+			for (int i=0; i < 10; i++) {				// используем метод "сортировка выбором" для преобразования массива
+				for (int k=i+1; k < 10; k++) {
+					if (v2[i][2] > v2[k][2]){
+							double temp = v2[i][2];
+							v2[i][2]=v2[k][2];
+							v2[k][2]=temp;
+							temp = v2[i][1];
+							v2[i][1]=v2[k][1];
+							v2[k][1]=temp;
+							temp = v2[i][0];
+							v2[i][0]=v2[k][0];
+							v2[k][0]=temp;
+						}
+					}
+				System.out.println(v2[i][0]+" "+v2[i][1]+" "+v2[i][2]);
+				}
+			
+	}
+	
+	public void poc_C(){
+		double c=10*4/15+1;
+		Math.round(c);
+		//System.out.println(c);
+		for (int i=1; i < 10; i++) {
+		System.out.println(v[i][0]+" "+v[i][1]+" "+v[i][2]);}
+		System.out.println("================");
+		for (int i=0; i < 7; i++) {
+			for (int k=i+1; k < 10; k++) {
+				if (i <= 5){
+					for (int j=0; j < 3; j++) {
+				//	v00[i][j]=v[k][j];
+				}
+				}
+				if (i > 5){
+					for (int j=0; j < 3; j++) {
+				//	v01[i][j]=v[i+3][j];
+				}
+				};
+				
+			}
+			//System.out.println(v[i][0]+" "+v[i][1]+" "+v[i][2]);
+			}
+		
 	}
 }

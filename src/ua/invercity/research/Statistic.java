@@ -137,7 +137,8 @@ public class Statistic {
 		return resultMatr;
 	}
 	
-	public void ComputArgument() {
+	public double[] getArguments() {
+		double[] result = new double[rowCount];
 		// МНК В=(Хтрансп*Х)-1*(Хтрасп*У)
 		// Матрица Х(х-си нормализованные) {1,x11,x12,x13; 1,x21,x22,x32,....}
 		double[][] matrX = new double[rowCount][columnCount];
@@ -182,15 +183,14 @@ public class Statistic {
 			}
 		}
 	    resultMatr = multMatrix(matrMultXtX,matrMultXtY,columnCount,columnCount,1);
-	    
-		//подсчет коефициентов
+		// calculate koefs
 		double b1= resultMatr[1][0]*standOtkl[0]/standOtkl[1];		
 		double b2=resultMatr[2][0]*standOtkl[0]/standOtkl[2];
 		double b3=resultMatr[3][0]*standOtkl[0]/standOtkl[3];
 		double b0= middleValues[0]-b1*middleValues[1]-b2*middleValues[2]-b3*middleValues[3];
-		for(int i=0; i<rowCount;i++) {
-			//System.out.println(b0+b1*dataMatrix[i][1]+b2*dataMatrix[i][2]+b3*dataMatrix[i][3]);
-		}
+		// create result array
+		for(int i=0; i<rowCount;i++) result[i] = b0+b1*dataMatrix[i][1]+b2*dataMatrix[i][2]+b3*dataMatrix[i][3];
+		return result;
 	}
 	
 	private double[][] parseDouble(Object[][] data) {

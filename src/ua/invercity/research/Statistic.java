@@ -14,8 +14,6 @@ public class Statistic {
 	// --- hetero
 	private double [] e;
 	private double [][] v;
-	private double [][] v1;
-	private double [][] v2;
 	private double [] Ytr;
 	private static double [] arr1 = 
 		{(double) 7.155196516872915, (double) 0.37930279709037523, (double) 0.5169114555157318, (double) 1.0070783381276622}; 
@@ -32,8 +30,8 @@ public class Statistic {
 		Ytr = new double[10];
 		e = new double[10];
 		v = new double[10][3];
-		v1 = new double[10][3];
-		v2 = new double[10][3];
+		//v1 = new double[10][3];
+		//v2 = new double[10][3];
 		// make calculations
 		computeAll();
 	}
@@ -203,45 +201,25 @@ public class Statistic {
 	}
 	
 	public double[] getYTr() {
-		double[] result = new double[rowCount];
-		for (int i=0; i<rowCount; i++) result[i]=arr1[0]+dataMatrix[i][1]*arr1[1]+dataMatrix[i][2]*arr1[2]+dataMatrix[i][3]*arr1[3];
-		return result;
+		for (int i=0; i<rowCount; i++) Ytr[i]=arr1[0]+dataMatrix[i][1]*arr1[1]+dataMatrix[i][2]*arr1[2]+dataMatrix[i][3]*arr1[3];
+		return Ytr;
 	}
 
 	public double[] getFaults() {
-		double[] result = new double[rowCount];
-		for (int i=0; i<rowCount; i++) result[i]=Math.abs(dataMatrix[i][0]-Ytr[i]);
-		return result;
+		for (int i=0; i<rowCount; i++) e[i]=dataMatrix[i][0]-Ytr[i];
+		return e;
 	}
 	
-	public double[][] getFaultX1Values() {
+	public double[][] getFaultXValues() {
 		for (int i=0; i<rowCount; i++){
-			v[i][0]=i;
+			v[i][0]=(int) i;
 			v[i][1]=e[i];
 			v[i][2]=dataMatrix[i][1];
 		}
 		return v;
 	}
 	
-	public double[][] getFaultX2Values() {
-		for (int i=0; i<rowCount; i++){
-			v1[i][0]=i;
-			v1[i][1]=e[i];
-			v1[i][2]=dataMatrix[i][1];
-		}
-		return v1;
-	}
-	
-	public double[][] getFaultX3Values() {
-		for (int i=0; i<rowCount; i++){
-			v2[i][0]=i;
-			v2[i][1]=e[i];
-			v2[i][2]=dataMatrix[i][1];
-		}
-		return v2;
-	}
-	
-	public double[][] getSortedFaultX1Values() {
+	public double[][] getSortedFaultXValues() {
 		for (int i=0; i<rowCount; i++) {
 			for (int k=i+1; k<rowCount; k++) {
 				if (v[i][2] > v[k][2]){
@@ -258,43 +236,5 @@ public class Statistic {
 			}
 		}
 		return v;
-	}
-	
-	public double[][] getSortedFaultX2Values() {
-		for (int i=0; i<rowCount; i++) {
-			for (int k=i+1; k<rowCount; k++) {
-				if (v1[i][2] > v1[k][2]){
-					double temp = v[i][2];
-					v1[i][2]=v1[k][2];
-					v1[k][2]=temp;
-					temp = v1[i][1];
-					v1[i][1]=v1[k][1];
-					v1[k][1]=temp;
-					temp = v1[i][0];				
-					v1[i][0]=v1[k][0];
-					v1[k][0]=temp;
-				}
-			}
-		}
-		return v1;
-	}
-	
-	public double[][] getSortedFaultX3Values() {
-		for (int i=0; i<rowCount; i++) {
-			for (int k=i+1; k<rowCount; k++) {
-				if (v2[i][2] > v2[k][2]){
-					double temp = v2[i][2];
-					v2[i][2]=v2[k][2];
-					v2[k][2]=temp;
-					temp = v2[i][1];
-					v2[i][1]=v2[k][1];
-					v2[k][1]=temp;
-					temp = v2[i][0];				
-					v2[i][0]=v2[k][0];
-					v2[k][0]=temp;	
-				}
-			}
-		}
-		return v2;
 	}
 }

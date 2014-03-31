@@ -11,11 +11,16 @@ import javax.swing.JList;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.JTextArea;
+
 import java.awt.Font;
+
 import javax.swing.JMenuBar;
 import javax.swing.JMenu;
+
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
+import java.math.BigDecimal;
+
 import javax.swing.JMenuItem;
 
 @SuppressWarnings("rawtypes")
@@ -91,7 +96,7 @@ public class MainView {
 					Statistic s = new Statistic(10, 4, data);
 					switch (index) {
 					case 0:
-						textArea.append("Мультиколинеарность\n");
+						textArea.append("// ----------- Мультиколинеарность ------------- //\n");
 						textArea.append("\n");
 						double determ = s.getDetermMatrix();
 						textArea.append("Определитель кореляционной матрицы - " + determ + ";\n");
@@ -131,7 +136,34 @@ public class MainView {
 						textArea.append("Это значит, что х2 и х3 не колинеарны между собой\n");
 						break;
 					case 1: 
-						textArea.append("Гетероскедастичность");
+						textArea.append("// -------- Гетероскедастичность --------- //");
+						textArea.append("\n");
+						textArea.append("Генерируем трендовые значения:\n");
+						double[] yTrand = s.getYTr();
+						for (int i=0;i<s.rowCount;i++) textArea.append(yTrand[i] + "\n");
+						textArea.append("Генерируем значения погрешностей:\n");
+						double[] yFaults = s.getFaults();
+						for (int i=0;i<s.rowCount;i++) textArea.append(yFaults[i] + "\n");
+						textArea.append("Значения до упорядочивания:\n");
+						double xBefore[][] = s.getFaultXValues();
+						for (int y=0;y<3;y++) {
+							for (int z=0;z<s.rowCount;z++) {
+								BigDecimal d = new BigDecimal(xBefore[z][y]);
+								d = d.setScale(4, BigDecimal.ROUND_HALF_DOWN);
+								textArea.append(d.doubleValue() + " ");
+							}
+							textArea.append("\n");
+						}
+						textArea.append("Значения после упорядочивания:\n");
+						double xAfter[][] = s.getSortedFaultXValues();
+						for (int y=0;y<3;y++) {
+							for (int z=0;z<s.rowCount;z++) {
+								BigDecimal d = new BigDecimal(xAfter[z][y]);
+								d = d.setScale(4, BigDecimal.ROUND_HALF_DOWN);
+								textArea.append(d.doubleValue() + " ");
+							}
+							textArea.append("\n");
+						}
 						break;
 					default:
 						break;
